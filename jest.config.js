@@ -4,11 +4,11 @@ export default {
     transform: {},
     moduleFileExtensions: ['js'],
     testMatch: [
-        '**/test/**/?(*.)test.js',
+        '**/tests/**/?(*.)test.js',
     ],
     collectCoverage: true,
     coverageReporters: ['lcov'],
-    coveragePathIgnorePatterns: ['<rootDir>/test/'],
+    coveragePathIgnorePatterns: ['<rootDir>/tests/'],
     coverageDirectory: '<rootDir>/coverage',
     reporters: ['default']
 };
