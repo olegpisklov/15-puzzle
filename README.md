@@ -1,4 +1,4 @@
-## CLI game 15 Puzzle
+## 15 Puzzle CLI game 
 
 In order to start playing run:
 
