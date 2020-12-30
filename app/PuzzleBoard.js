@@ -1,22 +1,35 @@
 import {DIRECTIONS, BOARD_STATUSES} from './constants.js';
 
+/**
+ * @typedef {Object} BoardState
+ * @property {String} status Board status: "finished" or "inProgress"
+ * @property {Array} values Board values
+ */
+
+ /**
+ * @typedef {Object} BoardConfig
+ * @property {Number} size Board size
+ */
+
 export default class PuzzleBoard {
     /**
-     * @param {Object} config
-     * @param {Number} config.size Board size (required)
-     * @param {Function} config.onUpdate Callback (required)
-     * @param {Function} config.onCreate Callback (required)
+     * @param {BoardConfig} config
      */
     constructor(config) {
         this.__validateConfig(config);
 
-        this.config = config;
         this.size = config.size;
         this.board = new Array(this.size);
         this.tiles = new Array(this.size**2 - 1);
         this.emptySpot = {row: null, col: null};
         this.inPlaceTilesCounter = 0;
+    }
 
+    /**
+     * Create puzzle board.
+     * @return {BoardState}
+     */
+    create() {
         this.__createTiles();
         this.__shuffleTiles();
         this.__pickEmptySpot();
@@ -24,12 +37,13 @@ export default class PuzzleBoard {
         this.__fillBoard();
         this.__updateInPlaceCounter();
 
-        this.config.onCreate(this.board);
+        return this.__getBoardState();
     }
 
     /**
-     * Move tile to provided direction
+     * Move a tile to provided direction
      * @param {String} direction 
+     * @return {BoardState}
      */
     makeMove(direction) {
         const {left, right, up, down} = DIRECTIONS;
@@ -52,14 +66,21 @@ export default class PuzzleBoard {
         }
 
         this.__updateInPlaceCounter();
-        this.config.onUpdate(this.board, this.__getBoardStatus());
+
+        return this.__getBoardState();
     }
 
-    __getBoardStatus() {
+    __getBoardState() {
+        let status = BOARD_STATUSES.inProgress;
+
         if (this.inPlaceTilesCounter === this.size**2 - 1) {
-            return BOARD_STATUSES.finished;
+            status = BOARD_STATUSES.finished;
         }
-        return BOARD_STATUSES.inProgress;
+
+        return {
+            status,
+            values: this.board
+        };
     }
 
     __moveUp() {
@@ -186,12 +207,6 @@ export default class PuzzleBoard {
         }
         if (!Number.isInteger(config.size)) {
             throw new Error('Board size should be a number.');
-        }
-        if (typeof config.onCreate !== 'function') {
-            throw new Error('onCreate callback is required.');
-        }
-        if (typeof config.onUpdate !== 'function') {
-            throw new Error('onUpdate callback is required.');
         }
     }
 }

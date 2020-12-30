@@ -10,29 +10,30 @@ process.stdin.setRawMode(true);
 console.log('Welcome!\nPlease use arrows to navigate.\nGood luck!\n\n');
 
 const puzzle = new PuzzleBoard({
-    size: config.boardSize,
-
-    onCreate: (board) => {
-        printBoard(board);
-    },
-    
-    onUpdate: (board, status) => {
-        printBoard(board);
-
-        if (status === BOARD_STATUSES.finished) {
-            console.log('Congratulations! Well done :)');
-            process.exit();
-        }
-    }
+    size: config.boardSize
 });
+const board = puzzle.create();
+
+printBoard(board.values);
 
 process.stdin.on('keypress', function(s, key) {
-    if (key.name in DIRECTIONS) {
-        console.log(`Moving ${key.name}... \n`);
-        puzzle.makeMove(key.name);
-    }
     if (key.name === 'c' && key.ctrl) {
         console.log('Thanks for playing. Buy :)');
+        process.exit();
+    }
+
+    if (!key.name in DIRECTIONS) {
+        return;
+    }
+
+    console.log(`Moving ${key.name}... \n`);
+
+    const board = puzzle.makeMove(key.name);
+
+    printBoard(board.values);
+
+    if (board.status === BOARD_STATUSES.finished) {
+        console.log('Congratulations! Well done :)');
         process.exit();
     }
 });
